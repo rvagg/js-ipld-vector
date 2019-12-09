@@ -25,6 +25,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/rvagg/js-ipld-hashmap.git"
+    "url": "git://github.com/rvagg/js-ipld-vector.git"
   }
 }
