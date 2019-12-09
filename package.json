@@ -1,6 +1,6 @@
 {
   "name": "ipld-vector",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A JavaScript implementation of the IPLD Vetor specification",
   "main": "ipld-vector.js",
   "scripts": {
