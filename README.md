@@ -22,13 +22,94 @@ Be aware that each mutation operation will create at least one new block, stored
 
 ### Contents
 
+ * [`async Vector.create(loader[, options])`](#Vector__create)
+ * [`async Vector.createFrom(loader, initialContents[, options])`](#Vector__createFrom)
+ * [`async Vector.load(loader, root[, options])`](#Vector__load)
  * [`class Vector`](#Vector)
  * [`async Vector#get(index)`](#Vector_get)
  * [`async Vector#size()`](#Vector_size)
  * [`async Vector#push(value)`](#Vector_push)
  * [`async Vector#values()`](#Vector_values)
  * [`async Vector#cids()`](#Vector_cids)
- * [`async Vector.create(loader[, root][, options])`](#Vector__create)
+
+<a name="Vector__create"></a>
+### `async Vector.create(loader[, options])`
+
+Create a new [`Vector`](#Vector) instance, beginning empty.
+
+A backing store must be provided to make use of a Vector, an interface to the store is given
+through the mandatory `loader` parameter. The backing store stores IPLD blocks, referenced by
+CIDs. `loader` must have two functions: `get(cid)` which should return the raw bytes (`Buffer`
+or `Uint8Array`) of a block matching the given CID, and `put(cid, block)` that will store the
+provided raw bytes of a block (`block`) and store it with the associated CID.
+
+**Parameters:**
+
+* **`loader`** _(`Object`)_: A loader with `get(cid):block` and `put(cid, block)` functions for
+  loading an storing block data by CID.
+* **`options`** _(`Object`, optional)_: Options for the Vector. Defaults are provided but you can tweak
+  behavior according to your needs with these options.
+  * **`options.blockCodec`** _(`string`, optional, default=`'dag-json'`)_: The IPLD codec used to encode the blocks.
+  * **`options.blockAlg`** _(`string`, optional, default=`'sha2-256'`)_: The hash algorithm to use when creating CIDs for
+    the blocks.
+  * **`options.width`** _(`string`, optional, default=`256`)_: The width, or "artiy" of Vector nodes. Each constituent
+    block of this Vector will contain, at most, `width` elements or `width` elements to child nodes.
+    When a Vector exceeds `width` elements, a new level ("height") is added, where each element of
+    the upper level is used to refer to nodes of the lower level. When the Vector reaches `2^width`
+    elements, another level is added, and so on. See
+    [IPLD Vector specification](https://github.com/ipld/specs/blob/master/schema-layer/data-structures/vector.md)
+    for more details on how this works.
+
+**Return value**  _(`Vector`)_: - A new, emptyVector instance.
+
+<a name="Vector__createFrom"></a>
+### `async Vector.createFrom(loader, initialContents[, options])`
+
+Create a new [`Vector`](#Vector) instance from an Array as its initial contents.
+
+See [`Vector.create`](#Vector__create) for more information on the required backing store.
+
+**Parameters:**
+
+* **`loader`** _(`Object`)_: A loader with `get(cid):block` and `put(cid, block)` functions for
+  loading an storing block data by CID.
+* **`initialContents`** _(`Array`)_: An `Array` of elements to create a new Vector from.
+  A new Vector will be created with those elements as the initial contents.
+* **`options`** _(`Object`, optional)_: Options for the Vector. Defaults are provided but you can tweak
+  behavior according to your needs with these options.
+  * **`options.blockCodec`** _(`string`, optional, default=`'dag-json'`)_: The IPLD codec used to encode the blocks.
+  * **`options.blockAlg`** _(`string`, optional, default=`'sha2-256'`)_: The hash algorithm to use when creating CIDs for
+    the blocks.
+  * **`options.width`** _(`string`, optional, default=`256`)_: The width, or "artiy" of Vector nodes.
+    See [`Vector.create`](#Vector__create) for more information on this option/
+
+**Return value**  _(`Vector`)_: - A Vector instance containing `initialContents`.
+
+<a name="Vector__load"></a>
+### `async Vector.load(loader, root[, options])`
+
+Create a new [`Vector`](#Vector) instance, beginning empty, or loading from existing data in a
+backing store.
+
+See [`Vector.create`](#Vector__create) for more information on the required backing store.
+
+**Parameters:**
+
+* **`loader`** _(`Object`)_: A loader with `get(cid):block` and `put(cid, block)` functions for
+  loading an storing block data by CID.
+* **`root`** _(`CID`)_: A root CID of an existing Vector. An existing Vector will be loaded from
+  the backing store, assuming that CID identifies the root block of a Vector.
+* **`options`** _(`Object`, optional)_: Options for the Vector. Defaults are provided but you can tweak
+  behavior according to your needs with these options.
+  * **`options.blockCodec`** _(`string`, optional, default=`'dag-json'`)_: The IPLD codec used to encode the blocks.
+  * **`options.blockAlg`** _(`string`, optional, default=`'sha2-256'`)_: The hash algorithm to use when creating CIDs for
+    the blocks.
+  * **`options.expectedWidth`** _(`number`, optional)_: When a `root` CID is provided, this option is used to
+    assert the expected `width` parameter that the existing Vector was created with.
+  * **`options.expectedHeight`** _(`number`, optional)_: When a `root` CID is provided, this option is used to
+    assert the expected `height` of the existing Vector.
+
+**Return value**  _(`Vector`)_: - A Vector instance loaded from an existing root block CID.
 
 <a name="Vector"></a>
 ### `class Vector`
@@ -105,47 +186,6 @@ full traversal of all nodes that make up this collection so may result in many b
 from the backing store if the collection is large.
 
 **Return value**  _(`AsyncIterator.<CID>`)_: An async iterator that yields CIDs for the blocks that comprise this Vector.
-
-<a name="Vector__create"></a>
-### `async Vector.create(loader[, root][, options])`
-
-Create a new [`Vector`](#Vector) instance, beginning empty, or loading from existing data in a
-backing store.
-
-A backing store must be provided to make use of a Vector, an interface to the store is given
-through the mandatory `loader` parameter. The backing store stores IPLD blocks, referenced by
-CIDs. `loader` must have two functions: `get(cid)` which should return the raw bytes (`Buffer`
-or `Uint8Array`) of a block matching the given CID, and `put(cid, block)` that will store the
-provided raw bytes of a block (`block`) and store it with the associated CID.
-
-**Parameters:**
-
-* **`loader`** _(`Object`)_: A loader with `get(cid):block` and `put(cid, block)` functions for
-  loading an storing block data by CID.
-* **`root`** _(`CID`, optional)_: A root of an existing Vector. Provide a CID if you want to load existing
-  data, otherwise omit this option and a new, empty Vector will be created.
-* **`options`** _(`Object`, optional)_: Options for the Vector. Defaults are provided but you can tweak
-  behavior according to your needs with these options.
-  * **`options.blockCodec`** _(`string`, optional, default=`'dag-json'`)_: The IPLD codec used to encode the blocks.
-  * **`options.blockAlg`** _(`string`, optional, default=`'sha2-256'`)_: The hash algorithm to use when creating CIDs for
-    the blocks.
-  * **`options.width`** _(`string`, optional, default=`256`)_: The width, or "artiy" of Vector nodes. Each constituent
-    block of this Vector will contain, at most, `width` elements or `width` elements to child nodes.
-    When a Vector exceeds `width` elements, a new level ("height") is added, where each element of
-    the upper level is used to refer to nodes of the lower level. When the Vector reaches `2^width`
-    elements, another level is added, and so on. See
-    [IPLD Vector specification](https://github.com/ipld/specs/blob/master/schema-layer/data-structures/vector.md)
-    for more details on how this works.
-  * **`options.hasher`** _(`function`, optional, default=`murmur3.x86`)_: A function that takes a byte array
-    (`Uint8Array`) and should return a byte representing a hash of the input. Supply this option if
-    you wish to override the default `'murmur3-32'` hasher.
-  * **`options.expectedWidth`** _(`number`, optional)_: When a `root` CID is provided, this option is used to
-    assert the expected `width` parameter that the existing Vector was created with.
-  * **`options.expectedHeight`** _(`number`, optional)_: When a `root` CID is provided, this option is used to
-    assert the expected `height` of the existing Vector.
-
-**Return value**  _(`Vector`)_: - A Vector instance, either loaded from an existing root block CID, or a new,
-  empty Vector if no CID is provided.
 
 ## License and Copyright
 

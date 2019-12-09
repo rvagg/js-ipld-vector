@@ -27,7 +27,7 @@ it('Basic usage', async () => {
 
   await verify(vector) // validate the vector we just put things into
 
-  const vector2 = await Vector.create(store, vector.cid)
+  const vector2 = await Vector.load(store, vector.cid)
 
   assert.strictEqual(vector2.cid, vector.cid, 'CIDs match')
 
@@ -40,7 +40,7 @@ it('Basic usage', async () => {
 
   await verify(vector2)
 
-  const vector3 = await Vector.create(store, vector2.cid)
+  const vector3 = await Vector.load(store, vector2.cid)
 
   await verify(vector3)
 

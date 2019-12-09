@@ -28,6 +28,8 @@ it('create() errors', async () => {
   assert.rejects(Vector.create(dummyLoader, { width: 'nope' }), 'create() bad width type')
   assert.rejects(Vector.create(dummyLoader, { expectedWidth: 'nope' }), 'create() bad expectedWidth type')
   assert.rejects(Vector.create(dummyLoader, { expectedHeight: 'nope' }), 'create() bad expectedHeight type')
+  assert.rejects(Vector.createFrom(dummyLoader, { nope: 'no!' }), 'createFrom without Array')
+  assert.rejects(Vector.load(dummyLoader, { nope: 'no!' }), 'load without CID')
 })
 
 it('CID load mismatch', async () => {
@@ -40,7 +42,7 @@ it('CID load mismatch', async () => {
 
   const hash = await multihashing(Buffer.from('blorp'), 'sha2-256')
   const cid = new CID(1, 'dag-cbor', hash) // just a random CID
-  assert.rejects(Vector.create(store, cid), 'bad loader rejects')
+  assert.rejects(Vector.load(store, cid), 'bad loader rejects')
 })
 
 it('non-storing store', async () => {
@@ -51,5 +53,5 @@ it('non-storing store', async () => {
 
   const hash = await multihashing(Buffer.from('blorp'), 'sha2-256')
   const cid = new CID(1, 'dag-cbor', hash) // just a random CID
-  assert.rejects(Vector.create(store, cid), 'bad loader rejects')
+  assert.rejects(Vector.load(store, cid), 'bad loader rejects')
 })
