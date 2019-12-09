@@ -4,7 +4,9 @@ const assert = require('assert')
 const Vector = require('../')
 const { toWords } = require('number-to-words')
 
-it('Many numbers', async () => {
+it('Many numbers', async function () {
+  this.timeout(10000)
+
   const expected = []
 
   const store = {
