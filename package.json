@@ -1,0 +1,30 @@
+{
+  "name": "ipld-vector",
+  "version": "1.0.0",
+  "description": "A JavaScript implementation of the IPLD Vetor specification",
+  "main": "ipld-vector.js",
+  "scripts": {
+    "test:node": "hundreds mocha test/*-test.js",
+    "test:browser": "polendina --cleanup test/*-test.js",
+    "lint": "npx standard *.js test/*.js",
+    "test": "npm run lint && npm run test:node && npm run test:browser",
+    "docs": "jsdoc4readme --readme ipld-vector.js"
+  },
+  "author": "Rod <rod@vagg.org> (http://r.va.gg/)",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@ipld/block": "~2.1.3",
+    "cids": "~0.7.1",
+    "iavector": "0.0.0"
+  },
+  "devDependencies": {
+    "hundreds": "0.0.2",
+    "jsdoc4readme": "~1.3.0",
+    "mocha": "~6.2.2",
+    "number-to-words": "^1.2.4"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/rvagg/js-ipld-hashmap.git"
+  }
+}
